@@ -1,0 +1,13 @@
+<div class="flex h-screen bg-gray-100">
+    @if(sidebarOpen||isDesktop){
+    <app-sidebar></app-sidebar>
+    }
+
+    <div class="flex-1 flex flex-col">
+        <app-header (toggleSidebar)="toggleSidebar()"></app-header>
+
+        <main class="flex-1 overflow-y-auto p-4">
+            <router-outlet />
+        </main>
+    </div>
+</div>
