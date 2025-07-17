@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AuthService } from '../../service/auth';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -11,10 +12,8 @@ import { CommonModule } from '@angular/common';
   styleUrl: './register.css'
 })
 export class Register {
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) { }
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router, private toastr: ToastrService) { }
   registerForm!: FormGroup;
-  message: string = '';
-
 
   ngOnInit() {
     this.registerForm = this.fb.group({
@@ -27,22 +26,18 @@ export class Register {
   onSubmit() {
     if (this.registerForm.invalid) return;
 
-    const { username, password, name } = this.registerForm.value;  
+    const { username, password, name } = this.registerForm.value;
+    console.log(this.registerForm.value);
     this.authService.register({ username, password, name }).subscribe({
       next: (res: any) => {
-        this.message = res.message;
-        console.log("Registration successful: ", res);
-        setTimeout(() => {
-          this.message = '';
-          this.router.navigate(["/"]);
-        }, 2000);
-
+        this.toastr.success(res.message, 'Success');
+        localStorage.setItem('user', JSON.stringify(res.data));
+        this.registerForm.reset();
+        this.router.navigate(['/auth/login']);
       },
       error: (err) => {
-        this.message = err.error.message;
-        setTimeout(() => {
-          this.message = "";
-        }, 2000);
+        console.log(err)
+        this.toastr.error(err.error.message || 'Login fallido', 'Error');
       }
     })
 

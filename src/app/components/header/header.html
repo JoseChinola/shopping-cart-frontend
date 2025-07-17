@@ -1,9 +1,7 @@
 <nav class="bg-white shadow-md px-8 py-4 flex justify-between items-center rounded-md">
-
-
+    <!-- Logo y botón hamburguesa -->
     <div class="flex items-center justify-center gap-2">
         <button (click)="toggleSidebar.emit()" class="md:hidden text-gray-700 mr-4 focus:outline-none">
-            <!-- Icono hamburguesa SVG -->
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
@@ -11,8 +9,44 @@
         <h1 *ngIf="toggleSidebar" class="text-xl font-bold hidden md:block">Mi Tienda</h1>
     </div>
 
+    <!-- Login + Carrito -->
+    <div class="flex items-center gap-4 relative">
 
-    <div>
-        <a routerLink="/auth/login" class="bg-blue-600 text-white px-4 py-2 rounded">Login</a>
+        <button class="flex items-center space-x-2 focus:outline-none group">
+            <div
+                class="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-medium uppercase">
+                {{ initials }}
+            </div>
+            <span class="text-gray-800 hidden md:inline">{{ fullName }}</span>
+        </button>
+        <!-- Carrito con contador -->
+        <a routerLink="/carrito" class="relative text-gray-700 hover:text-blue-600 transition-colors">
+            <!-- Ícono de carrito -->
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.6 8h11.2L17 13M7 13h10M9 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z" />
+            </svg>
+
+            <!-- Badge del contador -->
+            <span *ngIf="cartCount > 0"
+                class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {{ cartCount }}
+            </span>
+        </a>
+
+        <!-- Botón login o logout -->
+        <ng-container *ngIf="!isLoggedIn; else loggedInBlock">
+            <a routerLink="/auth/login"
+                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors">
+                Login
+            </a>
+        </ng-container>
+
+        <ng-template #loggedInBlock>
+            <button (click)="logout()"
+                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
+                Logout
+            </button>
+        </ng-template>
     </div>
 </nav>

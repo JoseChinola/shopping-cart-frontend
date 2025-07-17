@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../service/auth';
+import { ToastrService } from 'ngx-toastr';
+import { errorContext } from 'rxjs/internal/util/errorContext';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +13,7 @@ import { AuthService } from '../../service/auth';
   styleUrl: './login.css'
 })
 export class Login {
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) { }
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router, private toastr: ToastrService) { }
   loginForm!: FormGroup;
   message: string = '';
 
@@ -29,19 +31,15 @@ export class Login {
     const { username, password } = this.loginForm.value;
     this.authService.login({ username, password }).subscribe({
       next: (res: any) => {
-        this.message = res.message;
-        console.log("Login successful: ", res);
-        setTimeout(() => {
-          this.message = '';
-          this.router.navigate(["/"]);
-        }, 2000);
+        this.toastr.success(res.message, 'Success');
+        localStorage.setItem('user', JSON.stringify(res.data));
+        this.loginForm.reset();
+        this.router.navigate(['/']);
 
       },
       error: (err) => {
-        this.message = err.error.message;
-        setTimeout(() => {
-          this.message = "";
-        }, 2000);
+        console.log(err)
+        this.toastr.error(err.error.message || 'Login fallido', 'Error');
       }
     })
 

@@ -1,1 +1,26 @@
-<p>cart works!</p>
+<!-- src/app/components/cart/cart.component.html -->
+<section *ngIf="!loading">
+    <h2 class="text-xl font-semibold mb-4">Carrito de compras</h2>
+
+    <div *ngIf="items.length > 0; else emptyCart">
+        <div *ngFor="let item of items" class="mb-4 p-4 border rounded shadow">
+            <div class="flex items-center">
+                <img [src]="item.product.imageUrl" alt="Product" class="w-16 h-16 object-cover mr-4" />
+                <div>
+                    <h3 class="text-lg font-bold">{{ item.product.name }}</h3>
+                    <p>Cantidad: {{ item.quantity }}</p>
+                    <p>Precio unitario: ${{ item.product.price }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <p class="text-lg">Total de artículos: <strong>{{ totalItems }}</strong></p>
+            <p class="text-lg">Total a pagar: <strong>${{ totalPrice }}</strong></p>
+        </div>
+    </div>
+
+    <ng-template #emptyCart>
+        <p>El carrito está vacío.</p>
+    </ng-template>
+</section>
