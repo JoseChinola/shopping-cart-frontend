@@ -7,6 +7,7 @@ import { Layout } from './layout/layout';
 import { authGuard } from './guards/auth-guard';
 import { Login } from './auth/login/login';
 import { Register } from './auth/register/register';
+import { ProductDetail } from './components/product-detail/product-detail';
 
 export const routes: Routes = [
     {
@@ -16,6 +17,10 @@ export const routes: Routes = [
             {
                 path: "",
                 component: ProductList
+            },
+            {
+                path: "product/:id",
+                component: ProductDetail
             },
             {
                 path: "checkout",

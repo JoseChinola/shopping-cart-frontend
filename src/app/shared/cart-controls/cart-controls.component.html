@@ -1,0 +1,19 @@
+<!-- Mostrar botones + y - si ya está en el carrito -->
+<div *ngIf="isInCart(); else addTemplate" class="flex items-center justify-between gap-2 px-2 mt-2">
+    <button (click)="decrease()" class="bg-red-500 hover:bg-red-600 text-white px-5 rounded-xl">-</button>
+    <span class="text-sm font-medium">{{ getQuantity() }}</span>
+    <button (click)="increase()" class="bg-green-500 hover:bg-green-600 text-white px-5 rounded-xl">+</button>
+</div>
+
+<!-- Botón agregar al carrito -->
+<ng-template #addTemplate>
+    <button (click)="addToCart()"
+        class="flex items-center justify-center px-4 bg-blue-500 hover:bg-blue-600 text-white w-full py-1 rounded-md mt-2">
+        <svg class="-ms-2 me-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 4h1.5L8 16h8m-8 0a2 2 0 100 4 2 2 0 000-4m8 0a2 2 0 100 4 2 2 0 000-4M17 4v6m-3-3h6" />
+        </svg>
+        Add to cart
+    </button>
+</ng-template>

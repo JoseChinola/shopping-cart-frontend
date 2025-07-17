@@ -21,35 +21,23 @@
                 </div>
 
                 <!-- Detalles del producto -->
-                <div class="flex flex-col flex-grow">
+                <div class="flex flex-col flex-grow mb-2 px-3">
                     <h3 class="text-lg font-semibold text-gray-800">{{ product.name }}</h3>
-                    <p class="text-sm text-gray-600 mb-1">{{ product.description }}</p>
-                    <p class="text-blue-600 font-bold text-md mb-3">$ {{ product.price }}</p>
+                    <p class="text-sm text-gray-600 mb-2 line-clamp-2">{{ product.description }}</p>
+
+                    <div class="flex items-center justify-between mt-auto pt-2 border-t border-gray-200">
+                        <p class="text-blue-600 font-bold text-md">$ {{ product.price }}</p>
+                        <a [routerLink]="['/product', product.id]"
+                            class="text-sm text-blue-600 hover:underline hover:text-blue-800 transition duration-200">
+                            Ver más
+                        </a>
+                    </div>
                 </div>
 
-                <!-- Acciones del carrito -->
-                <div *ngIf="isInCart(product.id!); else addToCartTemplate"
-                    class="flex items-center justify-between gap-2 px-2">
-                    <button (click)="decreaseQuantity(product.id!)"
-                        class="bg-red-500 hover:bg-red-600 text-white px-5 rounded-xl">-</button>
-                    <span class="text-sm font-medium">{{ getCartQuantity(product.id!) }}</span>
-                    <button (click)="increaseQuantity(product.id)"
-                        class="bg-green-500 hover:bg-green-600 text-white px-5 rounded-xl">+</button>
-                </div>
 
-                <!-- Botón para agregar al carrito -->
-                <ng-template #addToCartTemplate>
-                    <button (click)="addToCart(product)"
-                        class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white w-full py-1 rounded-md transition">
-                        <svg class="-ms-2 me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-                            height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6" />
-                        </svg>
-                        Add to cart
-                    </button>
-
-                </ng-template>
+                <app-cart-controls [product]="product" [userId]="userId" [cartMap]="cartMap"
+                    (cartUpdated)="loadCartItems()">
+                </app-cart-controls>
             </div>
         </ng-container>
     </div>

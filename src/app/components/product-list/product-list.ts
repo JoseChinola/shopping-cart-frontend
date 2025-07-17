@@ -1,24 +1,27 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Product } from '../../models/product.model';
 import { productService } from '../../service/product.service';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../service/cart.service';
 import { ToastrService } from 'ngx-toastr';
+import { RouterModule } from '@angular/router';
+import { CartControlsComponent } from "../../shared/cart-controls/cart-controls.component";
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule, CartControlsComponent],
   templateUrl: './product-list.html',
   styleUrls: ['./product-list.css']
 })
-export class ProductList implements OnInit {
+export class ProductList implements OnInit, OnDestroy {
+  private cartUpdateSub!: Subscription;
   itemsPerPage: number = 8;
   currentPage: number = 1;
   products: Product[] = [];
-  loading: boolean = true;
-  cartItems: any[] = [];
   cartMap: Map<number, number> = new Map();
+  loading: boolean = true;
   userId!: number;
 
   constructor(
@@ -53,10 +56,9 @@ export class ProductList implements OnInit {
       // Obtener productos del carrito del usuario
       this.cartService.getCartItems(this.userId).subscribe({
         next: (response: any) => {
-          this.cartItems = response || [];
-          this.cartMap.clear();
+          const items = response.items || response || [];
 
-          for (const item of this.cartItems) {
+          for (const item of items) {
             this.cartMap.set(item.product.id, item.quantity);
           }
         },
@@ -67,11 +69,34 @@ export class ProductList implements OnInit {
 
     }
 
+    this.cartUpdateSub = this.cartService.cartUpdated$.subscribe(() => {
+      this.loadCartItems();
+    });
+
     if (user) {
       this.loadCartItems();
     }
   }
 
+  ngOnDestroy() {
+    this.cartUpdateSub?.unsubscribe();
+  }
+
+  loadCartItems(): void {
+    this.cartService.getCartItems(this.userId).subscribe({
+      next: (response: any) => {
+        const items = response.items || response || [];
+        this.cartMap.clear();
+
+        for (const item of items) {
+          this.cartMap.set(item.product.id, item.quantity);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading cart:', err);
+      }
+    });
+  }
 
   get paginatedProducts(): Product[] {
     const start = (this.currentPage - 1) * this.itemsPerPage;
@@ -83,103 +108,4 @@ export class ProductList implements OnInit {
     return Math.ceil(this.products.length / this.itemsPerPage);
   }
 
-  loadCartItems(): void {
-    this.cartService.getCartItems(this.userId).subscribe({
-      next: (response: any) => {
-        this.cartItems = response.items || [];
-        this.cartMap.clear();
-
-        for (const item of this.cartItems) {
-          this.cartMap.set(item.product.id, item.quantity);
-        }
-
-        this.updateCartCount();
-      },
-      error: (err) => {
-        console.error('Error loading cart:', err);
-      }
-    });
-  }
-
-  getCartQuantity(productId: number): number {
-    return this.cartMap.get(productId) || 0;
-  }
-
-  isInCart(productId: number): boolean {
-    return this.cartMap.has(productId);
-  }
-
-  addToCart(product: Product): void {
-    const payload = {
-      userId: this.userId,
-      productId: product.id,
-      quantity: 1
-    };
-
-    this.cartService.addToCart(payload).subscribe({
-
-      next: (res) => {
-        this.toastr.success(res.message, "Cart");
-        this.cartMap.set(product.id, (this.cartMap.get(product.id) || 0) + 1);
-        this.updateCartCount();
-      },
-      error: (err) => {
-        console.error('Error adding to cart:', err);
-      }
-    });
-  }
-
-  increaseQuantity(productId: number): void {
-
-    const current = this.getCartQuantity(productId);
-    const payload = {
-      userId: this.userId,
-      productId: productId,
-      delta: 1
-    };
-
-    this.cartService.updateCartItem(payload).subscribe({
-      next: (res) => {
-        this.toastr.success(res.message, "Cart");
-        this.cartMap.set(productId, current + 1);
-        this.updateCartCount();
-      },
-      error: (err) => {
-        console.error('Error increasing quantity:', err);
-      }
-    });
-  }
-
-  decreaseQuantity(productId: number): void {
-    const current = this.getCartQuantity(productId);
-    const payload = {
-      userId: this.userId,
-      productId: productId,
-      delta: -1
-    };
-
-    this.cartService.updateCartItem(payload).subscribe({
-      next: (res) => {
-        this.toastr.success(res.message, "Cart");
-        if (current - 1 <= 0) {
-          this.cartMap.delete(productId);
-        } else {
-          this.cartMap.set(productId, current - 1);
-        }
-        this.updateCartCount();
-      },
-      error: (err) => {
-        console.error('Error decreasing quantity:', err);
-      }
-    });
-  }
-
-  updateCartCount(): void {
-    let total = 0;
-    this.cartMap.forEach(qty => total += qty);
-    this.cartService.setCartCount(total);
-  }
-
-
-  // agregar servicios para el manejo de productos en cart.service.ts
 }
