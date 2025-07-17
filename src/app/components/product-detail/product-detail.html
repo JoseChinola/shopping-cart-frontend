@@ -1,8 +1,8 @@
 <section class="py-10 bg-white rounded-lg" *ngIf="!loading && product">
     <div class="max-w-screen-xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <!-- Imagen del producto -->
-        <div class="max-w-lg mx-auto">
-            <img class="w-full rounded-lg shadow-md object-contain p-2"
+        <div class=" mx-auto">
+            <img class="w-full h-56 rounded-lg shadow-md object-contain p-4"
                 [src]="'https://localhost:7086' + product.imageUrl" [alt]="product.name" />
         </div>
 

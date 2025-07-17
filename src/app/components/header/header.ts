@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../service/cart.service';
 import { count } from 'rxjs';
+import { AuthService } from '../../service/auth';
 
 @Component({
   selector: 'app-header',
@@ -20,7 +21,7 @@ export class Header {
   fullName: string = '';
   initials: string = '';
 
-  constructor(private cartService: CartService) { }
+  constructor(private cartService: CartService, private authService: AuthService) { }
 
 
   ngOnInit(): void {
@@ -58,7 +59,8 @@ export class Header {
   }
 
   logout(): void {
-    localStorage.removeItem('user');
+    this.authService.logout();
+    //this.cartService.clearCart();
     this.isLoggedIn = false;
     this.cartCount = 0;
   }

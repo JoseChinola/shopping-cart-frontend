@@ -25,9 +25,11 @@ export class Checkout implements OnInit {
     if (userId) {
       this.cartservice.getCartItems(userId).subscribe({
         next: (res: any) => {
+          this.cartservice.notifyCartUpdated();
           this.items = res.items;
           this.totalPrice = res.totalPrice;
           this.totalItems = res.totalItems;
+
         },
         error: (err) => {
           console.error('Error fetching cart items:', err);
@@ -42,7 +44,16 @@ export class Checkout implements OnInit {
     if (userId) {
       this.cartservice.checkoutCart(userId).subscribe({
         next: (res) => {
-          this.toaster.success(res.message);
+          this.toaster.success(res.message, 'Payment');
+
+          // Limpia los datos locales del carrito
+          this.items = [];
+          this.totalItems = 0;
+          this.totalPrice = 0;
+
+          // Notifica a otros componentes que el carrito fue actualizado
+          this.cartservice.notifyCartUpdated();
+          this.cartservice.fetchCart(userId);
         },
         error: (err) => {
           this.toaster.error(err.message);

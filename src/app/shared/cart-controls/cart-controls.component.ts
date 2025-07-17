@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Injectable, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Injectable, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { CartService } from '../../service/cart.service';
 import { CommonModule } from '@angular/common';
@@ -23,8 +23,6 @@ export class CartControlsComponent {
         private cartService: CartService,
         private toastr: ToastrService
     ) { }
-
-
 
     getQuantity(): number {
         return this.cartMap.get(this.product.id) || 0;
