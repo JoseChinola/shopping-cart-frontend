@@ -9,12 +9,16 @@
 
         <!-- Productos -->
         <ng-container *ngIf="!loading">
-            <div *ngFor="let product of products"
+            <div *ngIf="paginatedProducts.length === 0" class="col-span-full text-center text-gray-500 italic py-10">
+                No hay productos disponibles.
+            </div>
+            <div *ngFor="let product of paginatedProducts"
                 class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300 transform hover:scale-105 flex flex-col justify-between">
-
                 <!-- Imagen -->
-                <img [src]="product.imageUrl" [alt]="product.name"
-                    class="w-full h-40 object-cover rounded-lg mb-3 transition-all duration-300" />
+                <div class="w-full aspect-[4/3] overflow-hidden rounded-lg mb-2">
+                    <img [src]="'https://localhost:7086' + product.imageUrl" [alt]="product.name"
+                        class="w-full h-full object-contain transition-all duration-300" />
+                </div>
 
                 <!-- Detalles del producto -->
                 <div class="flex flex-col flex-grow">
@@ -24,22 +28,48 @@
                 </div>
 
                 <!-- Acciones del carrito -->
-                <div *ngIf="isInCart(product.id); else addToCartTemplate" class="flex items-center gap-2">
-                    <button (click)="decreaseQuantity(product.id)"
-                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md">-</button>
-                    <span class="text-sm font-medium">{{ getCartQuantity(product.id) }}</span>
+                <div *ngIf="isInCart(product.id!); else addToCartTemplate"
+                    class="flex items-center justify-between gap-2 px-2">
+                    <button (click)="decreaseQuantity(product.id!)"
+                        class="bg-red-500 hover:bg-red-600 text-white px-5 rounded-xl">-</button>
+                    <span class="text-sm font-medium">{{ getCartQuantity(product.id!) }}</span>
                     <button (click)="increaseQuantity(product.id)"
-                        class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md">+</button>
+                        class="bg-green-500 hover:bg-green-600 text-white px-5 rounded-xl">+</button>
                 </div>
 
                 <!-- Botón para agregar al carrito -->
                 <ng-template #addToCartTemplate>
                     <button (click)="addToCart(product)"
-                        class="bg-blue-500 hover:bg-blue-600 text-white w-full py-2 rounded-md transition">
-                        Agregar al carrito
+                        class="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white w-full py-1 rounded-md transition">
+                        <svg class="-ms-2 me-2 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6" />
+                        </svg>
+                        Add to cart
                     </button>
+
                 </ng-template>
             </div>
         </ng-container>
+    </div>
+
+    <!-- Paginación -->
+    <div class="flex justify-center mt-8 gap-3" *ngIf="products.length > 0">
+        <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1"
+            class="px-4  bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50">
+            Prev
+        </button>
+
+        <button *ngFor="let page of [].constructor(totalPages); let i = index" (click)="currentPage = i + 1"
+            [class.bg-blue-500]="currentPage === i + 1" [class.text-white]="currentPage === i + 1"
+            class="px-4 border border-gray-300 rounded-lg hover:bg-blue-100">
+            {{ i + 1 }}
+        </button>
+
+        <button (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages"
+            class="px-4  bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50">
+            Next
+        </button>
     </div>
 </div>

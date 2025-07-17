@@ -3,6 +3,7 @@ import { Product } from '../../models/product.model';
 import { productService } from '../../service/product.service';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../service/cart.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-product-list',
@@ -12,16 +13,18 @@ import { CartService } from '../../service/cart.service';
   styleUrls: ['./product-list.css']
 })
 export class ProductList implements OnInit {
-
+  itemsPerPage: number = 8;
+  currentPage: number = 1;
   products: Product[] = [];
   loading: boolean = true;
   cartItems: any[] = [];
-  cartMap: Map<number, number> = new Map(); // productId => quantity
+  cartMap: Map<number, number> = new Map();
   userId!: number;
 
   constructor(
     private productservice: productService,
-    private cartService: CartService
+    private cartService: CartService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -31,13 +34,13 @@ export class ProductList implements OnInit {
       this.userId = parsed?.id || 0;
     } else {
       console.warn('No se encontró información del usuario en localStorage.');
-      return;
     }
 
     // Obtener productos
     this.productservice.fetchProducts().subscribe({
       next: (data) => {
         this.products = data;
+        this.currentPage = 1;
         this.loading = false;
       },
       error: (err) => {
@@ -46,29 +49,44 @@ export class ProductList implements OnInit {
       }
     });
 
-    // Obtener productos del carrito del usuario
-    this.cartService.getCartItems(this.userId).subscribe({
-      next: (response: any) => {
-        this.cartItems = response || [];
-        this.cartMap.clear();
+    if (user) {
+      // Obtener productos del carrito del usuario
+      this.cartService.getCartItems(this.userId).subscribe({
+        next: (response: any) => {
+          this.cartItems = response || [];
+          this.cartMap.clear();
 
-        for (const item of this.cartItems) {
-          this.cartMap.set(item.product.id, item.quantity);
+          for (const item of this.cartItems) {
+            this.cartMap.set(item.product.id, item.quantity);
+          }
+        },
+        error: (err) => {
+          console.error('Error loading cart:', err);
         }
-      },
-      error: (err) => {
-        console.error('Error loading cart:', err);
-      }
-    });
+      });
 
-    this.loadCartItems();
+    }
+
+    if (user) {
+      this.loadCartItems();
+    }
   }
 
+
+  get paginatedProducts(): Product[] {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.products.slice(start, end);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.products.length / this.itemsPerPage);
+  }
 
   loadCartItems(): void {
     this.cartService.getCartItems(this.userId).subscribe({
       next: (response: any) => {
-        this.cartItems = response || [];
+        this.cartItems = response.items || [];
         this.cartMap.clear();
 
         for (const item of this.cartItems) {
@@ -99,8 +117,10 @@ export class ProductList implements OnInit {
     };
 
     this.cartService.addToCart(payload).subscribe({
-      next: () => {
-        this.cartMap.set(product.id, 1);
+
+      next: (res) => {
+        this.toastr.success(res.message, "Cart");
+        this.cartMap.set(product.id, (this.cartMap.get(product.id) || 0) + 1);
         this.updateCartCount();
       },
       error: (err) => {
@@ -110,15 +130,17 @@ export class ProductList implements OnInit {
   }
 
   increaseQuantity(productId: number): void {
+
     const current = this.getCartQuantity(productId);
     const payload = {
       userId: this.userId,
-      productId,
-      quantity: current + 1
+      productId: productId,
+      delta: 1
     };
 
     this.cartService.updateCartItem(payload).subscribe({
-      next: () => {
+      next: (res) => {
+        this.toastr.success(res.message, "Cart");
         this.cartMap.set(productId, current + 1);
         this.updateCartCount();
       },
@@ -130,35 +152,26 @@ export class ProductList implements OnInit {
 
   decreaseQuantity(productId: number): void {
     const current = this.getCartQuantity(productId);
+    const payload = {
+      userId: this.userId,
+      productId: productId,
+      delta: -1
+    };
 
-    if (current <= 1) {
-      // Eliminar del carrito si llega a 0
-      this.cartService.removeFromCart(this.userId, productId).subscribe({
-        next: () => {
+    this.cartService.updateCartItem(payload).subscribe({
+      next: (res) => {
+        this.toastr.success(res.message, "Cart");
+        if (current - 1 <= 0) {
           this.cartMap.delete(productId);
-          this.updateCartCount();
-        },
-        error: (err) => {
-          console.error('Error removing item:', err);
-        }
-      });
-    } else {
-      const payload = {
-        userId: this.userId,
-        productId,
-        quantity: current - 1
-      };
-
-      this.cartService.updateCartItem(payload).subscribe({
-        next: () => {
+        } else {
           this.cartMap.set(productId, current - 1);
-          this.updateCartCount();
-        },
-        error: (err) => {
-          console.error('Error decreasing quantity:', err);
         }
-      });
-    }
+        this.updateCartCount();
+      },
+      error: (err) => {
+        console.error('Error decreasing quantity:', err);
+      }
+    });
   }
 
   updateCartCount(): void {

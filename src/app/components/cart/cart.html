@@ -1,26 +1,57 @@
-<!-- src/app/components/cart/cart.component.html -->
-<section *ngIf="!loading">
-    <h2 class="text-xl font-semibold mb-4">Carrito de compras</h2>
+<section *ngIf="!loading"
+    class="fixed top-4 right-0 h-[calc(100%-2rem)] w-96 bg-white shadow-xl overflow-hidden rounded-l-lg flex flex-col z-50">
+    <header class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+        <h2 class="text-2xl font-bold text-gray-800">Shopping cart</h2>
+        <button (click)="closeCart()" aria-label="Cerrar carrito" class="text-gray-500 hover:text-gray-800 transition">
+            <!-- Icono de cerrar (X) -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </header>
 
-    <div *ngIf="items.length > 0; else emptyCart">
-        <div *ngFor="let item of items" class="mb-4 p-4 border rounded shadow">
-            <div class="flex items-center">
-                <img [src]="item.product.imageUrl" alt="Product" class="w-16 h-16 object-cover mr-4" />
-                <div>
-                    <h3 class="text-lg font-bold">{{ item.product.name }}</h3>
-                    <p>Cantidad: {{ item.quantity }}</p>
-                    <p>Precio unitario: ${{ item.product.price }}</p>
-                </div>
+    <div *ngIf="items.length > 0; else emptyCart" class="flex-grow overflow-y-auto px-6 py-4 space-y-6">
+        <div *ngFor="let item of items"
+            class="flex items-center gap-4 border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
+            <img [src]="'https://localhost:7086' + item.product.imageUrl" alt="{{ item.product.name }}"
+                class="w-20 h-20 object-contain rounded-md shadow-sm" />
+            <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-semibold text-gray-900 truncate" title="{{ item.product.name }}">
+                    {{ item.product.name }}
+                </h3>
+                <p class="text-gray-600 text-sm">
+                    Cantidad: <span class="font-medium">{{ item.quantity }}</span>
+                </p>
+                <p class="text-gray-600 text-sm">
+                    Precio unitario: <span class="font-medium">${{ item.product.price }}</span>
+                </p>
+                <p class="text-gray-800 mt-1 font-semibold text-sm">
+                    Subtotal: ${{ (item.product.price * item.quantity) | number:'1.2-2' }}
+                </p>
             </div>
-        </div>
-
-        <div class="mt-6">
-            <p class="text-lg">Total de artículos: <strong>{{ totalItems }}</strong></p>
-            <p class="text-lg">Total a pagar: <strong>${{ totalPrice }}</strong></p>
         </div>
     </div>
 
+    <footer class="border-t border-gray-200 px-6 py-4 flex flex-col gap-3">
+        <p class="text-lg font-semibold text-gray-900">
+            Total items:
+            <span class="text-blue-600">{{ totalItems }}</span>
+        </p>
+        <p class="text-lg font-semibold text-gray-900">
+            Total to pay:
+            <span class="text-green-600">${{ totalPrice | number:'1.2-2' }}</span>
+        </p>
+
+        <button class="mt-2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-md font-semibold transition"
+            (click)="checkout()">
+            Complete purchase
+        </button>
+    </footer>
+
     <ng-template #emptyCart>
-        <p>El carrito está vacío.</p>
+        <div class="flex-grow flex items-center justify-center px-6 py-4 text-center text-gray-500 italic">
+            Your cart is empty.
+        </div>
     </ng-template>
 </section>

@@ -12,7 +12,7 @@
     <!-- Login + Carrito -->
     <div class="flex items-center gap-4 relative">
 
-        <button class="flex items-center space-x-2 focus:outline-none group">
+        <button *ngIf="isLoggedIn;" class="flex items-center space-x-2 focus:outline-none group">
             <div
                 class="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-medium uppercase">
                 {{ initials }}
@@ -20,7 +20,7 @@
             <span class="text-gray-800 hidden md:inline">{{ fullName }}</span>
         </button>
         <!-- Carrito con contador -->
-        <a routerLink="/carrito" class="relative text-gray-700 hover:text-blue-600 transition-colors">
+        <button (click)="onCartClick()" class="relative text-gray-700 hover:text-blue-600 transition-colors">
             <!-- Ícono de carrito -->
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -32,7 +32,7 @@
                 class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {{ cartCount }}
             </span>
-        </a>
+        </button>
 
         <!-- Botón login o logout -->
         <ng-container *ngIf="!isLoggedIn; else loggedInBlock">

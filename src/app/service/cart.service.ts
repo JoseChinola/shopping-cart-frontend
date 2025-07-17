@@ -1,6 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
+import { Cart, CartItem } from "../models/cart.model";
 
 
 @Injectable({
@@ -31,13 +32,29 @@ export class CartService {
 
 
     // Obtener los productos del carrito
-    getCartItems(userId: number): Observable<{ items: any[], totalItems: number, totalPrice: number }> {
+    getCartItems(userId: number): Observable<Cart> {
         const url = `${this.apiURL}/Cart?userId=${userId}`;
-        return this.http.get<{ items: any[], totalItems: number, totalPrice: number }>(url);
+        return this.http.get<Cart>(url);
+    }
+
+    addToCart(cartitem: CartItem): Observable<any> {
+        const url = `${this.apiURL}/Cart/add`;
+        return this.http.post<any>(url, cartitem);
+    }
+
+    updateCartItem(payload: any): Observable<any> {
+        const url = `${this.apiURL}/Cart/quantity`;
+        return this.http.put<any>(url, payload);
+    }
+
+    checkoutCart(userId: number): Observable<any> {
+        const url = `${this.apiURL}/Cart/checkout?userId=${userId}`;
+        return this.http.post<any>(url, {});
     }
 
     setCartCount(count: number): void {
         this.cartCountSubject.next(count);
     }
+
 
 }

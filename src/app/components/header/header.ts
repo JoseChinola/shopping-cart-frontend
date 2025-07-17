@@ -12,6 +12,7 @@ import { count } from 'rxjs';
 })
 export class Header {
   @Output() toggleSidebar = new EventEmitter<void>();
+  @Output() openCart = new EventEmitter<void>()
   isLoggedIn = false;
   cartCount = 0;
   userId!: number;
@@ -51,5 +52,14 @@ export class Header {
     }
   }
 
-  logout(): void { }
+  onCartClick() {
+    console.log('Carrito clickeado');
+    this.openCart.emit();
+  }
+
+  logout(): void {
+    localStorage.removeItem('user');
+    this.isLoggedIn = false;
+    this.cartCount = 0;
+  }
 }
