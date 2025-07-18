@@ -19,6 +19,8 @@ export class Cart implements OnInit, OnDestroy {
   totalPrice: number = 0;
   loading: boolean = true;
   userId!: number;
+  showConfirmModal = false;
+  itemToDelete: number | null = null;
   @Output() close = new EventEmitter<void>();
 
   constructor(private cartService: CartService, private router: Router, private toaster: ToastrService) { }
@@ -82,6 +84,22 @@ export class Cart implements OnInit, OnDestroy {
     });
   }
 
+  removeItemConfirm(productId: number) {
+    this.itemToDelete = productId;
+    this.showConfirmModal = true;
+  }
 
+
+  confirmDelete() {
+    if (this.itemToDelete !== null) {
+      this.removeItem(this.itemToDelete); // tu método que elimina el producto
+      this.cancelDelete();
+    }
+  }
+
+  cancelDelete() {
+    this.showConfirmModal = false;
+    this.itemToDelete = null;
+  }
 
 }

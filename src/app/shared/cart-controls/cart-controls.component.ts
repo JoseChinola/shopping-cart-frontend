@@ -2,6 +2,8 @@ import { Component, EventEmitter, Injectable, Input, OnDestroy, OnInit, Output }
 import { ToastrService } from 'ngx-toastr';
 import { CartService } from '../../service/cart.service';
 import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../../service/auth';
 
 @Component({
     selector: 'app-cart-controls',
@@ -12,27 +14,35 @@ import { CommonModule } from '@angular/common';
 })
 
 
-export class CartControlsComponent implements OnInit {
-    userId!: number;
+export class CartControlsComponent implements OnInit, OnDestroy {
+    userId!: number | null;
     @Input() product: any;
     @Input() cartMap!: Map<number, number>;
+    private userSub!: Subscription;
 
     @Output() cartUpdated = new EventEmitter<void>();
 
     constructor(
         private cartService: CartService,
-        private toastr: ToastrService
+        private toastr: ToastrService,
+        private authService: AuthService
     ) { }
 
 
     ngOnInit(): void {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            const user = JSON.parse(storedUser);
-            this.userId = user.id;
-        }
+        this.userSub = this.authService.currentUser$.subscribe(user => {
+            if (user) {
+                this.userId = user.id ?? null;
+                this.cartService.fetchCart(this.userId);
+            } else {
+                this.userId = null;
+                this.cartMap.clear();
+                this.cartUpdated.emit();
+            }
+        });
+
     }
- 
+
     getQuantity(): number {
         console.log('chekc userId:', this.userId);
         return this.cartMap.get(this.product.id) || 0;
@@ -44,6 +54,11 @@ export class CartControlsComponent implements OnInit {
 
 
     addToCart(): void {
+        if (this.userId === null || this.userId === undefined) {
+            this.toastr.error('Usuario no autenticado');
+            return;
+        }
+
         const cartItem = {
             userId: this.userId,
             productId: this.product.id,
@@ -86,5 +101,9 @@ export class CartControlsComponent implements OnInit {
             this.cartUpdated.emit();
             this.cartService.notifyCartUpdated();
         });
+    }
+
+    ngOnDestroy(): void {
+        this.userSub.unsubscribe();
     }
 }

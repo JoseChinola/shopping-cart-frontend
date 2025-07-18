@@ -3,7 +3,19 @@
         <div
             class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-sky-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl">
         </div>
+
         <div class="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+            <div class="flex justify-end">
+                <a routerLink="/" aria-label="Go to Home"
+                    class="flex items-center gap-1 font-semibold text-cyan-600 hover:text-cyan-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 9l9-7 9 7v11a2 2 0 01-2 2h-4a2 2 0 01-2-2v-5H9v5a2 2 0 01-2 2H3a2 2 0 01-2-2V9z" />
+                    </svg>
+                    <span class="text-sm">Home</span>                    
+                </a>
+            </div>
 
             <form class="max-w-md mx-auto" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
                 <div>
@@ -49,7 +61,8 @@
             <div class="flex ">
                 <p class="text-sm font-semibold text-gray-700">
                     Don’t have an account yet?
-                    <a routerLink="/auth/register" class="text-blue-600 hover:text-blue-500 font-semibold hover:underline">
+                    <a routerLink="/auth/register"
+                        class="text-blue-600 hover:text-blue-500 font-semibold hover:underline">
                         Sign up
                     </a>
                 </p>

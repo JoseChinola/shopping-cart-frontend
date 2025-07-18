@@ -54,7 +54,6 @@ export class Header {
   }
 
   onCartClick() {
-    console.log('Carrito clickeado');
     this.openCart.emit();
   }
 
@@ -62,5 +61,8 @@ export class Header {
     this.authService.logout();
     this.isLoggedIn = false;
     this.cartCount = 0;
+    this.cartService.clearCart();
   }
+
+  
 }

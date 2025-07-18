@@ -75,4 +75,8 @@ export class CartService {
         this.cartCountSubject.next(count);
     }
 
+    clearCart() {
+        this.cartCountSubject.next(0);
+        this.notifyCartUpdated();
+    }
 }
