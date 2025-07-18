@@ -12,9 +12,9 @@ import { CommonModule } from '@angular/common';
 })
 
 
-export class CartControlsComponent {
+export class CartControlsComponent implements OnInit {
+    userId!: number;
     @Input() product: any;
-    @Input() userId!: number;
     @Input() cartMap!: Map<number, number>;
 
     @Output() cartUpdated = new EventEmitter<void>();
@@ -24,7 +24,17 @@ export class CartControlsComponent {
         private toastr: ToastrService
     ) { }
 
+
+    ngOnInit(): void {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            this.userId = user.id;
+        }
+    }
+ 
     getQuantity(): number {
+        console.log('chekc userId:', this.userId);
         return this.cartMap.get(this.product.id) || 0;
     }
 

@@ -22,9 +22,7 @@ export class ProductDetail implements OnInit {
     const user = localStorage.getItem('user');
     if (user) {
       const parsed = JSON.parse(user);
-      this.userId = parsed?.id || 0;
-    } else {
-      console.warn('No se encontró información del usuario en localStorage.');
+      this.userId = parsed.id;
     }
 
     const id = this.route.snapshot.paramMap.get('id');

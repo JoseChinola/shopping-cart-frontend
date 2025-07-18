@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../../service/cart.service';
 import { count } from 'rxjs';
 import { AuthService } from '../../service/auth';
@@ -60,7 +60,6 @@ export class Header {
 
   logout(): void {
     this.authService.logout();
-    //this.cartService.clearCart();
     this.isLoggedIn = false;
     this.cartCount = 0;
   }
