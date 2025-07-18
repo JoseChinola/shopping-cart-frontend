@@ -62,7 +62,8 @@ export class Header {
     this.isLoggedIn = false;
     this.cartCount = 0;
     this.cartService.clearCart();
+    window.location.reload();
   }
 
-  
+
 }

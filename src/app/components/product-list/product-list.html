@@ -46,7 +46,7 @@
     <div class="flex justify-center mt-8 gap-3" *ngIf="products.length > 0">
         <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1"
             class="px-4  bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50">
-            Prev
+            Anterior
         </button>
 
         <button *ngFor="let page of [].constructor(totalPages); let i = index" (click)="currentPage = i + 1"
@@ -57,7 +57,7 @@
 
         <button (click)="currentPage = currentPage + 1" [disabled]="currentPage === totalPages"
             class="px-4  bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 disabled:opacity-50">
-            Next
+            Siguiente
         </button>
     </div>
 </div>
